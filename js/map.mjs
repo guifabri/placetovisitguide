@@ -9,7 +9,7 @@ const ATTRIBUTION =
 let map = null;
 let markers = new Map(); // pageid -> L.Marker
 
-export function initMap(elId, center = [0, 0], zoom = 13) {
+export function initMap(elId, center = [40.7708, -111.8921], zoom = 15) {
   map = L.map(elId).setView(center, zoom);
   L.tileLayer(ESRI_TILES, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
   return map;
@@ -27,7 +27,14 @@ export function clearMarkers() {
 // Markers stay synced with the list: addMarkers() is called on every search/filter change.
 export function addMarkers(places, onSelect) {
   clearMarkers();
+  addMarkersIncremental(places, onSelect);
+}
+
+// Agregado progresivo: solo añade pageids nuevos, sin borrar los ya pintados.
+export function addMarkersIncremental(places, onSelect) {
+  if (!map) return;
   for (const p of places) {
+    if (markers.has(p.pageid)) continue;
     const m = L.marker([p.lat, p.lon]).addTo(map).bindPopup(p.name);
     m.on("click", () => onSelect?.(p.pageid));
     markers.set(p.pageid, m);
