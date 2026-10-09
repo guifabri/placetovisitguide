@@ -1,0 +1,4 @@
+# Local overrides (educational project: Geoapify key is hardcoded in js/api.mjs)
+.env
+.env.*
+*.local

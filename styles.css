@@ -1,0 +1,91 @@
+/* Graphic identity — proposal §7.
+   Teal #0F6B6B (primary), Orange #E8743B (accent/CTA),
+   White #FFFFFF (background), Dark gray #1F2A2E (text). Inter 400/500. */
+:root {
+  --teal: #0f6b6b;
+  --orange: #e8743b;
+  --bg: #ffffff;
+  --text: #1f2a2e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+header {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--teal);
+}
+header a { color: #fff; text-decoration: none; font-weight: 500; }
+.searchbar { display: flex; gap: 0.5rem; flex: 1; }
+.searchbar input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 10px;
+}
+main { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 60px); }
+.list-pane { padding: 1rem; overflow-y: auto; }
+#map { height: 100%; min-height: 320px; }
+.btn {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+.btn.ghost { background: transparent; border: 1px solid #fff; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }
+.chip {
+  border: 1px solid var(--teal);
+  background: #fff;
+  color: var(--teal);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  cursor: pointer;
+}
+.chip.active { background: var(--teal); color: #fff; }
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+.card h3 { margin: 0 0 0.2rem; font-size: 1rem; font-weight: 500; }
+.card .meta { margin: 0; color: #555; font-size: 0.85rem; }
+.fav { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--orange); }
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  max-width: 560px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+.modal-box img { width: 100%; border-radius: 10px; }
+.modal .row { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+.hidden { display: none !important; }
+@media (max-width: 720px) {
+  main { grid-template-columns: 1fr; }
+  #map { min-height: 300px; }
+}

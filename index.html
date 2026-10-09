@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Places to Visit Guide</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <a href="#" id="homeLink" class="logo">Places to Visit Guide</a>
+    <div class="searchbar">
+      <input id="search" type="search" placeholder="City, country or address…" />
+      <button id="searchBtn" class="btn">Search</button>
+      <button id="locateBtn" class="btn ghost">My location</button>
+    </div>
+    <a href="#" id="favLink">Favorites</a>
+  </header>
+
+  <main>
+    <section class="list-pane">
+      <h2 id="placeName">Search a destination</h2>
+      <div id="chips" class="chips"></div>
+      <div id="loader" class="hidden">Loading…</div>
+      <p id="message" class="hidden"></p>
+      <div id="cards"></div>
+    </section>
+    <section class="map-pane">
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal hidden"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="js/main.mjs"></script>
+</body>
+</html>
