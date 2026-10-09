@@ -7,7 +7,7 @@ Free to use, no account required.
 Proposal: `Places_to_Visit_Guide_proposal_v2.md` (+ `.pdf`).
 Planning board: https://trello.com/b/bGgvGUAd/places-visit-guide
 
-## APIs (§5)
+## APIs 
 
 | Source | URL | API key? |
 |---|---|---|
@@ -16,15 +16,8 @@ Planning board: https://trello.com/b/bGgvGUAd/places-visit-guide
 | Esri World Street Map (tiles) | `.../MapServer/tile/{z}/{y}/{x}` | No |
 | Leaflet (map library) | `https://leafletjs.com/` | No |
 
-## Setup
 
-1. The Geoapify key is hardcoded in `js/api.mjs` (educational project).
-2. Serve the folder over HTTP (tiles/APIs require it, `file://` won't work):
-   `npx serve` (or VS Code Live Server), then open the shown URL.
-3. Type a city + Enter, or press "My location".
-
-## Structure (§6)
-
+## Structure 
 ```
 index.html      entry point, Leaflet + Esri wiring (§3.2)
 styles.css      graphic identity §7 (Teal #0F6B6B, Orange #E8743B, Inter)
