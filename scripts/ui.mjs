@@ -1,7 +1,7 @@
-// §6 ui.mjs — cards, detail modal, filter chips, loaders/messages, haversine distance.
-
+// Available category filter options
 export const CATEGORIES = ["museums", "architecture", "nature", "religion", "history", "entertainment"];
 
+// Calculates the distance between two coordinate points in meters
 export function haversineMeters(aLat, aLon, bLat, bLon) {
   const R = 6371000;
   const dLat = ((bLat - aLat) * Math.PI) / 180;
@@ -12,20 +12,24 @@ export function haversineMeters(aLat, aLon, bLat, bLon) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
+// Formats meters into human-readable distance (km or m)
 export function formatDistance(m) {
   if (m == null) return "—";
   return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
 }
 
+// Shows or hides the loading spinner
 export function showLoading(el, on = true) {
   el.classList.toggle("hidden", !on);
 }
 
+// Shows a status/error message, or hides it if text is empty
 export function showMessage(el, text = "") {
   el.textContent = text;
   el.classList.toggle("hidden", !text);
 }
 
+// Renders category filter buttons (chips)
 export function renderChips(el, active, onPick) {
   el.innerHTML = "";
   for (const c of ["all", ...CATEGORIES]) {
@@ -37,7 +41,7 @@ export function renderChips(el, active, onPick) {
   }
 }
 
-// Clicking a card highlights its marker (proposal §3.3).
+// Renders the list of place cards with distance, favorite button, and click events
 export function renderCards(el, places, center, favorites, onOpen, onFav) {
   el.innerHTML = "";
   for (const p of places) {
@@ -60,7 +64,7 @@ export function renderCards(el, places, center, favorites, onOpen, onFav) {
   }
 }
 
-// §3.5 modal: image, description, coords, Wikipedia link, directions button.
+// Populates and displays the detail modal dialog for a selected place
 export function renderModal(el, details, isFav, onFav, onClose) {
   el.innerHTML = `
     <div class="modal-box">
@@ -94,6 +98,7 @@ export function renderModal(el, details, isFav, onFav, onClose) {
   el.classList.remove("hidden");
 }
 
+// Hides and clears the modal dialog content
 export function closeModal(el) {
   el.classList.add("hidden");
   el.innerHTML = "";

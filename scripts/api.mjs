@@ -1,19 +1,15 @@
-// §6 api.mjs — Geoapify geocode + Wikipedia geosearch/details + error handling.
-// No OpenTripMap/xid logic (removed in proposal v2).
-
-// Educational project: Geoapify key hardcoded (public teaching key).
+// API configuration and endpoint URLs
 const GEOAPIFY_KEY = "73d1a42d80b040749c2a4b5477a52e2c";
-
 const GEOCODE_URL = "https://api.geoapify.com/v1/geocode/search";
 const WIKI_URL = "https://en.wikipedia.org/w/api.php";
-// Paginación progresiva: lotes de 10 (límite Wikipedia por llamada),
-// hasta 18 llamadas por búsqueda (~180 candidatos, luego dedupe + orden por distancia).
-export const PAGE_SIZE = 10;
-export const MAX_TILE_CALLS = 18;
-export const TILE_RADIUS_M = 3000;
-// Offsets [norte_m, este_m] ordenados por distancia al centro.
-// El primero es el centro (los 10 más cercanos pintan primero),
-// el resto expande la cobertura de la ciudad.
+
+// Pagination and search grid limits
+export const PAGE_SIZE = 10;        // Max results per Wikipedia geosearch call
+export const MAX_TILE_CALLS = 18;   // Maximum grid sample calls allowed per search
+export const TILE_RADIUS_M = 3000;  // Search radius in meters for each query point
+
+// Offsets [north_meters, east_meters] sorted radially from center
+// Allows expanding coverage across the area starting from the exact location
 const TILE_OFFSETS_M = [
   [0, 0],
   [2500, 0], [-2500, 0], [0, 2500], [0, -2500],
@@ -23,6 +19,7 @@ const TILE_OFFSETS_M = [
   [7500, 0],
 ];
 
+// Calculates the straight-line distance in meters between two lat/lon points (Haversine formula)
 function haversineM(aLat, aLon, bLat, bLon) {
   const R = 6371000;
   const dLat = ((bLat - aLat) * Math.PI) / 180;
@@ -33,19 +30,22 @@ function haversineM(aLat, aLon, bLat, bLon) {
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
+// Calculates new coordinates given north and east distance offsets in meters
 function offsetLatLon(lat, lon, northM, eastM) {
   const dLat = northM / 111320;
   const dLon = eastM / (111320 * Math.cos((lat * Math.PI) / 180));
   return [lat + dLat, lon + dLon];
 }
 
+// Custom error class to categorize network, quota, and empty result errors
 export class ApiError extends Error {
   constructor(message, kind = "network") {
     super(message);
-    this.kind = kind; // network | quota | empty | key
+    this.kind = kind; // "network", "quota", or "empty"
   }
 }
 
+// Fetches and parses JSON from a URL with standardized error handling
 async function getJson(url) {
   let res;
   try {
@@ -60,7 +60,7 @@ async function getJson(url) {
   return res.json();
 }
 
-// §3.1 Location search — first Geoapify result wins.
+// Geocodes a text query into geographical coordinates using Geoapify
 export async function geocodeCity(text) {
   const url = `${GEOCODE_URL}?text=${encodeURIComponent(text)}&limit=1&format=json&apiKey=${GEOAPIFY_KEY}`;
   const data = await getJson(url);
@@ -73,7 +73,7 @@ export async function geocodeCity(text) {
   };
 }
 
-// §3.3 Attractions list — un tile Wikipedia (lote de 10) alrededor de un punto.
+// Queries a single batch of Wikipedia places around a specific coordinate
 async function fetchTile(lat, lon) {
   const params = new URLSearchParams({
     action: "query",
@@ -88,7 +88,7 @@ async function fetchTile(lat, lon) {
   return data?.query?.geosearch ?? [];
 }
 
-// Compat: una sola llamada (primer lote, 10 más cercanos al centro).
+// Performs a single search around coordinates, returning up to 10 closest places
 export async function searchPlaces(lat, lon) {
   const rows = await fetchTile(lat, lon);
   if (!rows.length) throw new ApiError("No results near this location.", "empty");
@@ -101,26 +101,29 @@ export async function searchPlaces(lat, lon) {
   }));
 }
 
-// §3.3 Stream progresivo — hasta MAX_TILE_CALLS llamadas de 10, en orden de
-// distancia al centro. Emite cada lote nuevo vía onBatch y ordena el acumulado
-// por distancia en main.mjs. Secuencial (no paralelo) para que el primer
-// pintado sean los 10 más cercanos.
+// Progressively streams place results in batches around a center coordinate
 export async function searchPlacesStream(centerLat, centerLon, onBatch, shouldAbort) {
   const seen = new Set();
   let totalNew = 0;
   let emptyStreak = 0;
   const calls = Math.min(MAX_TILE_CALLS, TILE_OFFSETS_M.length);
+
   for (let i = 0; i < calls; i++) {
+    // Check if the current search was superseded or cancelled
     if (shouldAbort?.()) break;
+
     const [nM, eM] = TILE_OFFSETS_M[i];
     const [tLat, tLon] = offsetLatLon(centerLat, centerLon, nM, eM);
     let rows;
     try {
       rows = await fetchTile(tLat, tLon);
     } catch {
-      continue; // un tile fallido no tumba los demás
+      continue; // Skip failed tile queries without breaking entire stream
     }
+
     if (shouldAbort?.()) break;
+
+    // Filter out duplicate places already encountered in previous tiles
     const fresh = [];
     for (const p of rows) {
       if (seen.has(p.pageid)) continue;
@@ -133,22 +136,26 @@ export async function searchPlacesStream(centerLat, centerLon, onBatch, shouldAb
         dist: haversineM(centerLat, centerLon, p.lat, p.lon),
       });
     }
+
+    // Stop searching if consecutive queries return no new places
     if (!fresh.length) {
       emptyStreak++;
-      if (emptyStreak >= 3 && totalNew > 0) break; // ciudad ya cubierta
+      if (emptyStreak >= 3 && totalNew > 0) break;
       continue;
     }
+
     emptyStreak = 0;
-    // Lote ordenado por distancia antes de pintar.
+    // Sort the new batch by distance before passing to callback
     fresh.sort((a, b) => a.dist - b.dist);
     totalNew += fresh.length;
     await onBatch?.(fresh);
   }
+
   if (!totalNew) throw new ApiError("No results near this location.", "empty");
   return totalNew;
 }
 
-// §3.5 Place details — image + summary + coordinates + Wikipedia link.
+// Fetches detailed article information (image, summary, coordinates) for a given place ID
 export async function getPlaceDetails(pageid) {
   const params = new URLSearchParams({
     action: "query",
@@ -163,6 +170,7 @@ export async function getPlaceDetails(pageid) {
   const data = await getJson(`${WIKI_URL}?${params}`);
   const page = data?.query?.pages?.[pageid];
   if (!page) throw new ApiError("Details not available.", "empty");
+
   return {
     pageid,
     name: page.title,

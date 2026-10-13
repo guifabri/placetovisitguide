@@ -1,12 +1,11 @@
-/* Graphic identity — proposal §7.
-   Teal #0F6B6B (primary), Orange #E8743B (accent/CTA),
-   White #FFFFFF (background), Dark gray #1F2A2E (text). Inter 400/500. */
+/* Brand color scheme and typography settings */
 :root {
   --teal: #0f6b6b;
   --orange: #e8743b;
   --bg: #ffffff;
   --text: #1f2a2e;
 }
+
 * { box-sizing: border-box; }
 html, body { overflow-x: clip; }
 body {
@@ -16,6 +15,8 @@ body {
   background: var(--bg);
 }
 img { max-width: 100%; }
+
+/* Navigation and top header */
 header {
   display: flex;
   gap: 0.75rem;
@@ -27,6 +28,8 @@ header {
 header a { color: #fff; text-decoration: none; font-weight: 500; }
 .logo { font-size: clamp(1rem, 2.5vw, 1.15rem); white-space: nowrap; }
 #favLink { white-space: nowrap; margin-left: auto; padding: 0.5rem 0.25rem; }
+
+/* Search bar controls */
 .searchbar { display: flex; gap: 0.5rem; flex: 1 1 280px; min-width: 0; }
 .searchbar input {
   flex: 1;
@@ -34,13 +37,17 @@ header a { color: #fff; text-decoration: none; font-weight: 500; }
   padding: 0.5rem 0.75rem;
   border: none;
   border-radius: 10px;
-  font-size: 16px; /* evita auto-zoom en iOS */
+  font-size: 16px; /* Prevents auto-zoom on iOS */
 }
+
+/* Main layout split between list and map */
 main { display: grid; grid-template-columns: minmax(360px, 480px) 1fr; min-height: calc(100vh - 60px); min-height: calc(100dvh - 60px); }
 .list-pane { padding: 1rem; overflow-y: auto; min-width: 0; }
 .list-pane h2 { font-size: clamp(1.1rem, 2.5vw, 1.5rem); overflow-wrap: break-word; margin: 0.5rem 0; }
 .map-pane { min-width: 0; min-height: 320px; position: relative; }
 #map { height: 100%; min-height: 320px; z-index: 0; }
+
+/* Buttons */
 .btn {
   background: var(--orange);
   color: #fff;
@@ -52,6 +59,8 @@ main { display: grid; grid-template-columns: minmax(360px, 480px) 1fr; min-heigh
   font-size: 1rem;
 }
 .btn.ghost { background: transparent; border: 1px solid #fff; }
+
+/* Filter chips */
 .chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }
 .chip {
   border: 1px solid var(--teal);
@@ -62,6 +71,8 @@ main { display: grid; grid-template-columns: minmax(360px, 480px) 1fr; min-heigh
   cursor: pointer;
 }
 .chip.active { background: var(--teal); color: #fff; }
+
+/* Place card item */
 .card {
   display: flex;
   justify-content: space-between;
@@ -78,6 +89,8 @@ main { display: grid; grid-template-columns: minmax(360px, 480px) 1fr; min-heigh
 .card h3 { margin: 0 0 0.2rem; font-size: clamp(0.95rem, 2.5vw, 1rem); font-weight: 500; overflow-wrap: break-word; }
 .card .meta { margin: 0; color: #555; font-size: 0.85rem; }
 .fav { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--orange); min-width: 44px; min-height: 44px; display: grid; place-items: center; }
+
+/* Place details modal */
 .modal {
   position: fixed;
   inset: 0;
@@ -106,14 +119,17 @@ main { display: grid; grid-template-columns: minmax(360px, 480px) 1fr; min-heigh
 .modal .row { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
 .modal .row .btn { flex: 1 1 auto; min-height: 44px; text-align: center; text-decoration: none; display: inline-grid; place-items: center; }
 .hidden { display: none !important; }
-/* Controles Leaflet usables en táctil */
+
+/* Touch-friendly adjustments for Leaflet map controls */
 .leaflet-control-zoom a { width: 36px !important; height: 36px !important; line-height: 36px !important; }
 .leaflet-control-attribution { font-size: 10px; max-width: 70vw; }
-/* Tablet */
+
+/* Tablet responsive layout */
 @media (max-width: 1024px) {
   main { grid-template-columns: minmax(300px, 400px) 1fr; }
 }
-/* Móvil: mapa arriba sticky + lista abajo, un solo scroll */
+
+/* Mobile responsive layout (sticky map at top, scrolling list below) */
 @media (max-width: 860px) {
   header { gap: 0.5rem; }
   .searchbar { flex: 1 1 100%; order: 3; }
@@ -155,6 +171,8 @@ main { display: grid; grid-template-columns: minmax(360px, 480px) 1fr; min-heigh
   .modal-box img { max-height: 40vh; object-fit: cover; }
   .modal-close { width: 100%; }
 }
+
+/* Small mobile devices */
 @media (max-width: 480px) {
   header { padding: 0.6rem 0.75rem; }
   .logo { font-size: 0.95rem; }

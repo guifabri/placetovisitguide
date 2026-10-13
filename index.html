@@ -4,12 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Places to Visit Guide</title>
+
+  <!-- Favicon and mobile touch icons -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="favicon.svg" />
+
+  <!-- External Leaflet CSS for map styling -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Application styles -->
   <link rel="stylesheet" href="styles/styles.css" />
 </head>
 <body>
+  <!-- Header: Brand logo, search controls, and favorites navigation -->
   <header>
     <a href="#" id="homeLink" class="logo">Places to Visit Guide</a>
     <div class="searchbar">
@@ -20,7 +27,9 @@
     <a href="#" id="favLink">Favorites</a>
   </header>
 
+  <!-- Main viewport: Two-pane layout with list and interactive map -->
   <main>
+    <!-- Left panel: Destination title, category chips, status messages, and place cards -->
     <section class="list-pane">
       <h2 id="placeName">Search a destination</h2>
       <div id="chips" class="chips"></div>
@@ -28,14 +37,20 @@
       <p id="message" class="hidden"></p>
       <div id="cards"></div>
     </section>
+
+    <!-- Right panel: Interactive map container -->
     <section class="map-pane">
       <div id="map"></div>
     </section>
   </main>
 
+  <!-- Modal overlay: Place details dialog -->
   <div id="modal" class="modal hidden"></div>
 
+  <!-- Leaflet JavaScript library -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Main ES module entry point -->
   <script type="module" src="scripts/main.mjs"></script>
 </body>
 </html>
