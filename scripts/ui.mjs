@@ -1,5 +1,5 @@
 // Available category filter options
-export const CATEGORIES = ["museums", "architecture", "nature", "religion", "history", "entertainment"];
+export const CATEGORIES = ["museum", "architecture", "park", "church", "history", "casino"];
 
 // Calculates the distance between two coordinate points in meters
 export function haversineMeters(aLat, aLon, bLat, bLon) {
